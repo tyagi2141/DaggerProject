@@ -10,10 +10,19 @@ import com.bumptech.glide.RequestManager;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.daggerproject.R;
 
+import java.util.concurrent.TimeUnit;
+
+import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
+import okhttp3.OkHttpClient;
+import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
+import retrofit2.converter.gson.GsonConverterFactory;
+
+import static com.example.daggerproject.util.Constants.BASE_URL;
 
 /**
  * Created by Rahul on 23/05/20.
@@ -21,6 +30,21 @@ import dagger.Provides;
 
 @Module
 public class AppModule {
+
+    @Singleton
+    @Provides
+    static Retrofit getRetrfitInstance(){
+
+        OkHttpClient okHttpClient = new OkHttpClient().newBuilder()
+                .connectTimeout(60, TimeUnit.SECONDS)
+                .readTimeout(60, TimeUnit.SECONDS)
+                .writeTimeout(60, TimeUnit.SECONDS)
+                .build();
+
+        return new Retrofit.Builder().baseUrl(BASE_URL).addConverterFactory(GsonConverterFactory.create()).
+                client(okHttpClient).
+                addCallAdapterFactory(RxJava2CallAdapterFactory.create()).build();
+    }
 
     @Singleton
     @Provides
